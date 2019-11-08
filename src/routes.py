@@ -17,24 +17,24 @@ api = Api(
     doc="/api/v1/swagger",
 )
 
-ns = api.namespace("api/v1", description="Test Samba")
-input_model = Schemas(api).input_model()
+ns = api.namespace("api/v1", description="TCC")
+# input_model = Schemas(api).input_model()
 
 
-input_model = Schemas(api).input_model()
+# input_model = Schemas(api).input_model()
 
 
 @ns.route("/predict-accident")
 class Predict(Resource):
-    @ns.doc("Videos")
-    @ns.expect(input_model)
+    @ns.doc("TCC")
+    # @ns.expect(input_model)
     @ns.response(code=HTTPStatus.OK, description="Ok")
     @ns.response(code=HTTPStatus.INTERNAL_SERVER_ERROR, description="Internal Server Error")
     @ns.response(code=HTTPStatus.UNPROCESSABLE_ENTITY, description="Unprocessable Entity")
     @ns.response(code=HTTPStatus.PRECONDITION_FAILED, description="Precondition Failed")
     def post(self):
 
-        response = Predict(request.data).save_video()
+        response = Predict(request.data).main()
         code = response["code"]
         del response["code"]
         return response, code
