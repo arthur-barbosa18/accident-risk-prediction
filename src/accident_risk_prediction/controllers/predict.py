@@ -38,7 +38,10 @@ class Predict:
                 )
 
     def calculate_kde(self):
-        self.kde = CalculateKDE(self.coordinates.lat, self.coordinates.lng).main()
+        try:
+            self.kde = CalculateKDE(self.coordinates.lat, self.coordinates.lng).main()
+        except Exception as err:
+            self.error.append(err)
 
     def filter_coordinates(self):
         self.coordinates = FilterCoordinates()
@@ -47,11 +50,15 @@ class Predict:
     def calculate_predict(self):
         values = np.vstack([self.coordinates.lat, self.coordinates.lng])
         max_value = self.kde(values).max()
+        import ipdb
+
+        ipdb.set_trace()  # breakpoint 7831ab57 //
+
         self.estimate = self.kde([self.location["lat"], self.location["lng"]])[0]
         return self.estimate / max_value
 
     def to_rank(self):
-        self.risk = self.calculate_predict()
+        self.risk = round(self.calculate_predict(), 2)
         if self.risk <= 0.1:
             return "Pífio"
         elif self.risk <= 0.2:
@@ -70,15 +77,17 @@ class Predict:
 
     def main(self):
         if any(self.errors):
-            return {"code": HTTPStatus.BAD_REQUEST, "errors": str(self.errors)}
+            return {"code": HTTPStatus.UNPROCESSABLE_ENTITY, "errors": str(self.errors)}
         self.filter_coordinates()
         if any(self.coordinates.errors):
             return {"code": HTTPStatus.BAD_REQUEST, "errors": str(self.errors)}
         self.calculate_kde()
+        if any(self.errors):
+            return {"code": HTTPStatus.INTERNAL_SERVER_ERROR, "errors": str(self.errors)}
         self.calculate_predict()
         return {
             "code": HTTPStatus.OK,
             "message": "Seu indice de sofrer acidente no ponto {} é {} e igual a {}".format(
-                self.location, self.to_rank(), round(self.risk, 2)
+                self.location, self.to_rank(), self.risk
             ),
         }
