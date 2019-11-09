@@ -27,10 +27,6 @@ class CalculateKDE:
         try:
             values = np.vstack([self.lat, self.lng])
             self.kernel = stats.gaussian_kde(values)
-            import ipdb
-
-            ipdb.set_trace()  # breakpoint f38a82a6 //
-
             return self.kernel
         except Exception as err:
             logger.error(err)

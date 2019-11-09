@@ -50,9 +50,6 @@ class Predict:
     def calculate_predict(self):
         values = np.vstack([self.coordinates.lat, self.coordinates.lng])
         max_value = self.kde(values).max()
-        import ipdb
-
-        ipdb.set_trace()  # breakpoint 7831ab57 //
 
         self.estimate = self.kde([self.location["lat"], self.location["lng"]])[0]
         return self.estimate / max_value
