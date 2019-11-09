@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source src/venv/bin/activate
+source venv/bin/activate
 export PYTHONPATH=$(pwd)/src
 export HOST=localhost
 #docker run -d -p 6379:6379 redis:latest

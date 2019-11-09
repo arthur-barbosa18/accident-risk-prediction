@@ -10,7 +10,6 @@ from scipy import stats, integrate
 import json
 from datetime import datetime
 from http import HTTPStatus
-from jsonschema import validate, Draft7Validator
 from accident_risk_prediction.models.Schemas import Schemas
 from pymongo import MongoClient
 import random
@@ -25,6 +24,6 @@ class CalculateKDE:
         self.lat, self.lng = lat, lng
 
     def main(self):
-        values = np.vstack([lat, lng])
+        values = np.vstack([self.lat, self.lng])
         self.kernel = stats.gaussian_kde(values)
         return self.kernel

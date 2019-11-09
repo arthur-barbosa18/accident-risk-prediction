@@ -31,10 +31,9 @@ class Predict:
                 logger.error(err)
 
             if not any(self.errors):
-                self.person, self.vec, self.weather, self.location = (
+                self.person, self.vec, self.location = (
                     newBody["person"],
                     newBody["vec"],
-                    # newBody["weather"],
                     newBody["location"],
                 )
 
@@ -42,39 +41,44 @@ class Predict:
         self.kde = CalculateKDE(self.coordinates.lat, self.coordinates.lng).main()
 
     def filter_coordinates(self):
-        self.coordinates = FilterCoordinates(self.person, self.vec)
+        self.coordinates = FilterCoordinates()
+        self.coordinates.main(self.person, self.vec)
 
     def calculate_predict(self):
         values = np.vstack([self.coordinates.lat, self.coordinates.lng])
         max_value = self.kde(values).max()
-        self.estimate = self.kde([self.location["lat"], self.location["lng"]])
+        self.estimate = self.kde([self.location["lat"], self.location["lng"]])[0]
         return self.estimate / max_value
 
     def to_rank(self):
-        if self.calculate_predict() <= 0.2:
+        self.risk = self.calculate_predict()
+        if self.risk <= 0.1:
+            return "Pífio"
+        elif self.risk <= 0.2:
             return "Muito Baixo"
-        elif self.calculate_predict() <= 0.4:
+        elif self.risk <= 0.4:
             return "Baixo"
-        elif self.calculate_predict() <= 0.6:
-            return "Moderado"
-        elif self.calculate_predict() <= 0.8:
+        elif self.risk <= 0.6:
+            return "Mediano"
+        elif self.risk <= 0.8:
             return "Alto"
-        elif self.calculate_predict() <= 1:
+        elif self.risk <= 1:
             return "Muito Alto"
 
     def validate_body(self, body):
         return Draft7Validator(Schemas.input_body).iter_errors(body)
 
     def main(self):
+        if any(self.errors):
+            return {"code": HTTPStatus.BAD_REQUEST, "errors": str(self.errors)}
         self.filter_coordinates()
-        if any(self.coordinates.errors) or any(self.errors):
-            self.errors.append(self.coordinates.errors)
-            return {"code": HTTPStatus.BAD_REQUEST, "errors": self.errors}
+        if any(self.coordinates.errors):
+            return {"code": HTTPStatus.BAD_REQUEST, "errors": str(self.errors)}
         self.calculate_kde()
         self.calculate_predict()
         return {
-            "code": HttpStatus.OK,
-            "message": "Seu indice de sofrer acidente em Belo Horizonte é {}".format(
-                self.to_rank()
+            "code": HTTPStatus.OK,
+            "message": "Seu indice de sofrer acidente no ponto {} é {} e igual a {}".format(
+                self.location, self.to_rank(), round(self.risk, 2)
             ),
         }

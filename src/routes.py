@@ -25,7 +25,7 @@ ns = api.namespace("api/v1", description="TCC")
 
 
 @ns.route("/predict-accident")
-class Predict(Resource):
+class PredictAccident(Resource):
     @ns.doc("TCC")
     # @ns.expect(input_model)
     @ns.response(code=HTTPStatus.OK, description="Ok")
