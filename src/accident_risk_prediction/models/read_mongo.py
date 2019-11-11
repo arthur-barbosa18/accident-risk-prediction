@@ -17,6 +17,17 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
+WEEKDAY = {
+    0: "segunda-feira",
+    1: "terça-feira",
+    2: "quarta-feira",
+    3: "quinta-feira",
+    4: "sexta-feira",
+    5: "sábado",
+    6: "domingo",
+}
+
+
 class FilterCoordinates:
     def __init__(self):
         self.errors = []
@@ -24,7 +35,10 @@ class FilterCoordinates:
             client = MongoClient("localhost", 27017)
             database = client.tcc
             revelante_data = database.revelante_data
-            self.accident_data = [accident for accident in revelante_data.find({})]
+            weekday = WEEKDAY.get(datetime.now().weekday())
+            self.accident_data = [
+                accident for accident in revelante_data.find({"weekday": weekday})
+            ]
         except Exception as err:
             logger.error(err)
             self.errors.append({"code": HTTPStatus.INTERNAL_SERVER_ERROR, "message": err.message})
