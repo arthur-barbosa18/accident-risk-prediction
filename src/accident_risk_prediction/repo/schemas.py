@@ -1,5 +1,8 @@
 """ Module to store schemas """
 
+from accident_risk_prediction.repo.constants import (VEHICLE_TYPE,
+                                                     CATEGORIES, GENDER)
+
 INPUT_BODY = {
     "$schema": "http://json-schema.org/schema#",
     "type": "object",
@@ -15,7 +18,7 @@ INPUT_BODY = {
             "properties": {
                 "age": {"type": "integer"},
                 "condutor": {"type": "boolean"},
-                "gender": {"type": "string", "enum": ["M", "F"]},
+                "gender": {"type": "string", "enum": GENDER},
             },
         },
         "vec": {
@@ -23,42 +26,11 @@ INPUT_BODY = {
             "properties": {
                 "vec_type": {
                     "type": "string",
-                    "enum": [
-                        "NAO INFORMADO",
-                        "AUTOMOVEL",
-                        "BICICLETA",
-                        "MICROONIBUS",
-                        "CAMINHAO",
-                        "TREM",
-                        "CARRO DEAOTRATOR DEODAS",
-                        "TRATOR DESTEIRAS",
-                        "ESPECIAL",
-                        "MOTOCICLETA",
-                        "ONIBUS",
-                        "CAMIONETA",
-                        "TRACAO",
-                        "CHARRETE",
-                        "CARROCA",
-                        "MOTONETA",
-                        "CICLOMOTOR",
-                        "CAMINHAO-TRATO",
-                        "TRATOR MISTO",
-                        "TRICICLO",
-                        "REBOQUE EEMI",
-                        "REBOQUE",
-                        "MISTO",
-                    ],
+                    "enum": VEHICLE_TYPE,
                 },
                 "category": {
                     "type": "string",
-                    "enum": [
-                        "NAO INFORMADO",
-                        "PARTICULAR",
-                        "APRENDIZAGEM",
-                        "ALUGUEL",
-                        "OFICIAL",
-                        "MISSAO DIPLOMATICA",
-                    ],
+                    "enum": CATEGORIES,
                 },
             },
         },
